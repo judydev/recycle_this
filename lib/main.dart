@@ -1,14 +1,21 @@
-import 'package:flame/flame.dart';
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:recycle_this/src/my_game.dart';
+import 'package:recycle_this/src/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
 
-  Flame.device.fullScreen();
-  Flame.device.setLandscape();
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  final game = MyGame();
-  runApp(GameWidget(game: game));
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: (RouteSettings routeSettings) =>
+          generateRoutes(routeSettings),
+      initialRoute: '/',
+    );
+  }
 }

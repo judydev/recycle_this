@@ -18,7 +18,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true
@@ -27,4 +27,11 @@ flutter:
   generate: true
 
   assets:
-    - assets/images/
+    - assets/images/cans/
+    - assets/images/clothes/
+    - assets/images/cups/
+    - assets/images/electronics/
+    - assets/images/furnitures/
+    - assets/images/packages/
+    - assets/images/papers/
+    - assets/images/plastic/
