@@ -27,11 +27,12 @@ flutter:
   generate: true
 
   assets:
-    - assets/images/cans/
+    - assets/images/can/
+    - assets/images/bottle/
     - assets/images/clothes/
-    - assets/images/cups/
+    - assets/images/cup/
     - assets/images/electronics/
-    - assets/images/furnitures/
+    - assets/images/furniture/
     - assets/images/packages/
-    - assets/images/papers/
+    - assets/images/paper/
     - assets/images/plastic/
