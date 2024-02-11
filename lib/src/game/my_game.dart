@@ -16,13 +16,16 @@ class MyGame extends StatefulWidget {
   State<MyGame> createState() => _MyGameState();
 }
 
-enum Categories { can, cup, paper, bottle }
+enum Categories { can, cup, paper, bottle, clothes, furniture, electronics }
 
 List countMap = [
-  {'folder': 'cans', 'category': Categories.can.name, 'count': 14},
-  {'folder': 'cups', 'category': Categories.cup.name, 'count': 7},
-  {'folder': 'papers', 'category': Categories.paper.name, 'count': 12},
-  {'folder': 'plastic', 'category': Categories.bottle.name, 'count': 12},
+  {'category': Categories.can.name, 'count': 14},
+  {'category': Categories.cup.name, 'count': 7},
+  {'category': Categories.paper.name, 'count': 12},
+  {'category': Categories.bottle.name, 'count': 12},
+  {'category': Categories.clothes.name, 'count': 12},
+  {'category': Categories.furniture.name, 'count': 12},
+  {'category': Categories.electronics.name, 'count': 12},
 ];
 
 class _MyGameState extends State<MyGame> {
@@ -55,7 +58,7 @@ class _MyGameState extends State<MyGame> {
 
   void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (secondsLeft == 0) {
+      if (secondsLeft <= 0) {
         setState(() {
           timer.cancel();
         });
@@ -120,18 +123,42 @@ class _MyGameState extends State<MyGame> {
             ],
             title: Text(chosenCategory!)),
         body: SafeArea(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Selected: $found'),
-            Text('Wrong: $wrong'),
-            const Padding(padding: EdgeInsets.all(20)),
-            Expanded(
-                child: GridView.count(
-                    shrinkWrap: true,
-                    crossAxisCount: colCount,
-                    children: spriteList)),
-          ],
+            child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Selected: ${found.length}/; Wrong: ${wrong.length}'),
+              const Padding(padding: EdgeInsets.all(10)),
+              Container(
+                  height: MediaQuery.sizeOf(context).height * 0.8,
+                  // height: 2000,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                        Colors.blue[100]!,
+                        Colors.lightBlueAccent,
+                        Colors.blueGrey[50]!,
+                        Colors.blueGrey[400]!,
+                        Colors.lightBlueAccent,
+                        Colors.blueAccent,
+                        Colors.blue[900]!,
+                        Colors.blueGrey[800]!,
+                      ])),
+                  child: Expanded(
+                    child: GridView.count(
+                        shrinkWrap: true,
+                        crossAxisCount: colCount,
+                        children: spriteList),
+                  )),
+              // Expanded(
+              //     child: GridView.count(
+              //         shrinkWrap: true,
+              //         crossAxisCount: colCount,
+              //         children: spriteList)),
+            ],
+          ),
         )));
   }
 
@@ -147,10 +174,15 @@ class _MyGameState extends State<MyGame> {
 
         return Tappable(
             id: keyId,
-            child: Image.asset(
-                'assets/images/${json['folder']}/${json['category']}-${i + 1}.png',
-                width: 40,
-                height: 50),
+            child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationZ(
+                  Random().nextDouble() * 2 * pi,
+                ),
+                child: Image.asset(
+                    'assets/images/${json['category']}/${json['category']}-${i + 1}.png',
+                    width: 40,
+                    height: 50)),
             onTap: (id) {
               if (chosenCategory == json['category']) {
                 setState(() {
@@ -180,6 +212,7 @@ class _MyGameState extends State<MyGame> {
               }
             });
       }));
+      list.addAll(List.generate(2, (i) => const SizedBox.shrink()));
     }
 
     return list;
