@@ -16,6 +16,7 @@ class _MainMenuState extends State<MainMenu> {
         body: Center(
       child: Column(
         children: [
+          const Padding(padding: EdgeInsets.only(top: 50)),
           const Text('Ready to play?'),
           TextButton(
             onPressed: () {

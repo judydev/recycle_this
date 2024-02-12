@@ -15,20 +15,35 @@ class MyGame extends StatefulWidget {
   State<MyGame> createState() => _MyGameState();
 }
 
-enum Categories { can, cup, paper, bottle, clothes, furniture, electronics }
+enum Categories {
+  bottle,
+  can,
+  clothes,
+  cup,
+  electronics,
+  furniture,
+  paper,
+  parcel,
+  plastic,
+}
 
-List countMap = [
-  {'category': Categories.can.name, 'count': 14},
-  {'category': Categories.cup.name, 'count': 7},
-  {'category': Categories.paper.name, 'count': 12},
-  {'category': Categories.bottle.name, 'count': 12},
-  {'category': Categories.clothes.name, 'count': 12},
-  {'category': Categories.furniture.name, 'count': 12},
-  {'category': Categories.electronics.name, 'count': 12},
-];
+Map<Categories, int> countMap = {
+  Categories.bottle: 14,
+  Categories.can: 14,
+  Categories.clothes: 12,
+  Categories.cup: 7,
+  Categories.electronics: 12,
+  Categories.furniture: 13,
+  Categories.paper: 12,
+  Categories.parcel: 1,
+  Categories.plastic: 6,
+};
+
+const randomCount = 13;
 
 class _MyGameState extends State<MyGame> {
   late final String? chosenCategory;
+  late final int? expectedItemCount;
   late List<Widget> spriteList = [];
 
   Set<int> found = {};
@@ -42,7 +57,10 @@ class _MyGameState extends State<MyGame> {
   void initState() {
     super.initState();
 
-    chosenCategory = Categories.values[Random().nextInt(Categories.values.length)].name;
+    final keys = countMap.keys.toList();
+    final chosenKey = keys[Random().nextInt(keys.length)];
+    expectedItemCount = countMap[chosenKey];
+    chosenCategory = chosenKey.name;
 
     spriteList = generateSpriteList();
     spriteList.shuffle();
@@ -127,11 +145,12 @@ class _MyGameState extends State<MyGame> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Selected: ${found.length}/; Wrong: ${wrong.length}'),
-              const Padding(padding: EdgeInsets.all(10)),
+              Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                      'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
               Container(
-                  height: MediaQuery.sizeOf(context).height * 0.8,
-                  // height: 2000,
+                  height: MediaQuery.sizeOf(context).height,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -140,7 +159,7 @@ class _MyGameState extends State<MyGame> {
                         Colors.blue[100]!,
                         Colors.lightBlueAccent,
                         Colors.blueGrey[50]!,
-                        Colors.blueGrey[400]!,
+                        Colors.blueGrey[200]!,
                         Colors.lightBlueAccent,
                         Colors.blueAccent,
                         Colors.blue[900]!,
@@ -152,11 +171,6 @@ class _MyGameState extends State<MyGame> {
                         crossAxisCount: colCount,
                         children: spriteList),
                   )),
-              // Expanded(
-              //     child: GridView.count(
-              //         shrinkWrap: true,
-              //         crossAxisCount: colCount,
-              //         children: spriteList)),
             ],
           ),
         )));
@@ -165,10 +179,11 @@ class _MyGameState extends State<MyGame> {
   generateSpriteList() {
     List<Widget> list = [];
     int keyId = 0;
-    for (final json in countMap) {
-      list.addAll(List.generate(json['count'], (i) {
+    for (final categoryKey in countMap.keys) {
+      String category = categoryKey.name;
+      list.addAll(List.generate(countMap[categoryKey]!, (i) {
         keyId++;
-        if (json['category'] == chosenCategory) {
+        if (category == chosenCategory) {
           expected.add(keyId);
         }
 
@@ -180,41 +195,63 @@ class _MyGameState extends State<MyGame> {
                   Random().nextDouble() * 2 * pi,
                 ),
                 child: Image.asset(
-                    'assets/images/${json['category']}/${json['category']}-${i + 1}.png',
+                    'assets/images/$category/$category-${i + 1}.png',
                     width: 40,
                     height: 50)),
             onTap: (id) {
-              if (chosenCategory == json['category']) {
+              if (category == chosenCategory) {
                 setState(() {
                   found.add(id);
                   expected.remove(id);
                 });
+
+                if (expected.isEmpty) {
+                  _timer.cancel();
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog.fullscreen(
+                            child: SizedBox(
+                                child: Column(children: [
+                          const Text('You made it!'),
+                          replayButton(context),
+                          homeButton(context)
+                        ])));
+                      });
+                }
               } else {
                 setState(() {
                   secondsLeft -= 2;
                   wrong.add(id);
                 });
               }
-
-              if (expected.isEmpty) {
-                _timer.cancel();
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Dialog.fullscreen(
-                          child: SizedBox(
-                              child: Column(children: [
-                        const Text('You made it!'),
-                        replayButton(context),
-                        homeButton(context)
-                      ])));
-                    });
-              }
             });
       }));
-      list.addAll(List.generate(2, (i) => const SizedBox.shrink()));
+      // list.add(const SizedBox.shrink());
     }
 
+    final int randomStart = keyId;
+    list.addAll(List.generate(randomCount, (i) {
+      keyId++;
+
+      return Tappable(
+          id: keyId,
+          child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationZ(
+                Random().nextDouble() * 2 * pi,
+              ),
+              child: Image.asset(
+                  'assets/images/random/${keyId - randomStart}.png',
+                  width: 40, height: 50)),
+          onTap: (id) {
+            setState(() {
+              secondsLeft -= 2;
+              wrong.add(id);
+            });
+          });
+    }));
+      
     return list;
   }
 }
