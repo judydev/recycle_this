@@ -1,4 +1,3 @@
-import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:recycle_this/src/game/my_game.dart';
 
@@ -20,9 +19,7 @@ class _MainMenuState extends State<MainMenu> {
           const Text('Ready to play?'),
           TextButton(
             onPressed: () {
-              String chosenCategory = Categories.values.random().name;
-              Navigator.pushNamed(context, MyGame.routeName,
-                  arguments: chosenCategory);
+              Navigator.pushNamed(context, MyGame.routeName);
             },
             child: const Text('Start'),
           )

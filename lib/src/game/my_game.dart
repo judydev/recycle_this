@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:recycle_this/src/main_menu.dart';
-import 'package:recycle_this/src/tappable.dart';
+import 'package:recycle_this/src/game/tappable.dart';
 
 int colCount = 10;
 
@@ -43,7 +42,8 @@ class _MyGameState extends State<MyGame> {
   void initState() {
     super.initState();
 
-    chosenCategory = Categories.values.random().name;
+    chosenCategory = Categories.values[Random().nextInt(Categories.values.length)].name;
+
     spriteList = generateSpriteList();
     spriteList.shuffle();
 
