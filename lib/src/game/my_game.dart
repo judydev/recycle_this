@@ -141,38 +141,36 @@ class _MyGameState extends State<MyGame> {
             ],
             title: Text(chosenCategory!)),
         body: SafeArea(
-            child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                      'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
-              Container(
-                  // height: MediaQuery.sizeOf(context).height,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                        Colors.blue[100]!,
-                        Colors.lightBlueAccent,
-                        Colors.blueGrey[50]!,
-                        Colors.blueGrey[200]!,
-                        Colors.lightBlueAccent,
-                        Colors.blueAccent,
-                        Colors.blue[900]!,
-                        Colors.blueGrey[800]!,
-                      ])),
-                  child: Expanded(
-                    child: GridView.count(
-                        shrinkWrap: true,
-                        crossAxisCount: colCount,
-                        children: spriteList),
-                  )),
-            ],
-          ),
+            child: Column(
+          // mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
+            Container(
+                // height: MediaQuery.sizeOf(context).height,
+                // decoration: BoxDecoration(
+                //     gradient: LinearGradient(
+                //         begin: Alignment.topCenter,
+                //         end: Alignment.bottomCenter,
+                //         colors: [
+                //       Colors.blue[100]!,
+                //       Colors.lightBlueAccent,
+                //       Colors.blueGrey[50]!,
+                //       Colors.blueGrey[200]!,
+                //       Colors.lightBlueAccent,
+                //       Colors.blueAccent,
+                //       Colors.blue[900]!,
+                //       Colors.blueGrey[800]!,
+                //     ])),
+                child: Expanded(
+                  child: GridView.count(
+                      shrinkWrap: true,
+                      crossAxisCount: colCount,
+                      children: spriteList),
+                )),
+          ],
         )));
   }
 
