@@ -150,7 +150,7 @@ class _MyGameState extends State<MyGame> {
                   child: Text(
                       'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
               Container(
-                  height: MediaQuery.sizeOf(context).height,
+                  // height: MediaQuery.sizeOf(context).height,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
                           begin: Alignment.topCenter,
