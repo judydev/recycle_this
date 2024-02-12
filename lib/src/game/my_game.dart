@@ -142,34 +142,33 @@ class _MyGameState extends State<MyGame> {
             title: Text(chosenCategory!)),
         body: SafeArea(
             child: Column(
-          // mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                     'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
-            Container(
-                // height: MediaQuery.sizeOf(context).height,
-                // decoration: BoxDecoration(
-                //     gradient: LinearGradient(
-                //         begin: Alignment.topCenter,
-                //         end: Alignment.bottomCenter,
-                //         colors: [
-                //       Colors.blue[100]!,
-                //       Colors.lightBlueAccent,
-                //       Colors.blueGrey[50]!,
-                //       Colors.blueGrey[200]!,
-                //       Colors.lightBlueAccent,
-                //       Colors.blueAccent,
-                //       Colors.blue[900]!,
-                //       Colors.blueGrey[800]!,
-                //     ])),
-                child: Expanded(
+            Expanded(
+              child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                        Colors.blue[100]!,
+                        Colors.lightBlueAccent,
+                        Colors.blueGrey[50]!,
+                        Colors.blueGrey[200]!,
+                        Colors.lightBlueAccent,
+                        Colors.blueAccent,
+                        Colors.blue[900]!,
+                        Colors.blueGrey[800]!,
+                      ])),
                   child: GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: colCount,
-                      children: spriteList),
-                )),
+                      children: spriteList)),
+            ),
           ],
         )));
   }
@@ -225,7 +224,6 @@ class _MyGameState extends State<MyGame> {
               }
             });
       }));
-      // list.add(const SizedBox.shrink());
     }
 
     final int randomStart = keyId;
