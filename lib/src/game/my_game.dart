@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:recycle_this/src/main_menu.dart';
 import 'package:recycle_this/src/game/tappable.dart';
@@ -84,14 +83,7 @@ class _MyGameState extends State<MyGame> {
         showDialog(
             context: context,
             builder: (context) {
-              return Dialog.fullscreen(
-                  child: Column(
-                children: [
-                  const Text('Sorry you did not make it'),
-                  replayButton(context),
-                  homeButton(context)
-                ],
-              ));
+              return fullscreenDialog(context, "Sorry you did not make it");
             });
       } else {
         setState(() {
@@ -113,7 +105,13 @@ class _MyGameState extends State<MyGame> {
 
     return Scaffold(
         appBar: AppBar(
-            leading: Text('${secondsLeft}s'),
+            backgroundColor: Colors.blue[100]!,
+            leadingWidth: 80,
+            leading: Row(children: [
+              const SizedBox(width: 20),
+              const Icon(Icons.timer_sharp),
+              Text('${secondsLeft}s')
+            ]),
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
@@ -122,31 +120,34 @@ class _MyGameState extends State<MyGame> {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          return Dialog.fullscreen(
-                              child: Column(
-                            children: [
-                              const Text('Paused'),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    startTimer();
-                                  },
-                                  child: const Text('Continue')),
-                              homeButton(context),
-                            ],
-                          ));
+                          return fullscreenDialog(context, 'Paused');
                         });
                   },
                   icon: const Icon(Icons.pause))
             ],
-            title: Text(chosenCategory!)),
+            title: Text('Category: $chosenCategory')),
         body: SafeArea(
             child: Column(
           children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    'Selected: ${found.length}/$expectedItemCount, Wrong: ${wrong.length}')),
+            Container(
+                width: MediaQuery.sizeOf(context).width,
+                decoration: BoxDecoration(color: Colors.blue[100]!),
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Found: ${found.length} / $expectedItemCount',
+                            style: const TextStyle(
+                                color: Colors.green, fontSize: 16)),
+                        const SizedBox(width: 15),
+                        Text(
+                          'Wrong: ${wrong.length}',
+                          style:
+                              TextStyle(color: Colors.red[300], fontSize: 16),
+                        )
+                      ],
+                    ))),
             Expanded(
               child: Container(
                   padding: const EdgeInsets.all(10),
@@ -167,8 +168,7 @@ class _MyGameState extends State<MyGame> {
                   child: GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: colCount,
-                      children: spriteList)),
-            ),
+                        children: spriteList)))
           ],
         )));
   }
@@ -207,13 +207,7 @@ class _MyGameState extends State<MyGame> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return Dialog.fullscreen(
-                            child: SizedBox(
-                                child: Column(children: [
-                          const Text('You made it!'),
-                          replayButton(context),
-                          homeButton(context)
-                        ])));
+                        return fullscreenDialog(context, 'You made it!');
                       });
                 }
               } else {
@@ -250,21 +244,52 @@ class _MyGameState extends State<MyGame> {
       
     return list;
   }
-}
 
-getRandomInRange(int min, int max) {
-  return min + Random().nextInt(max - min);
+  Widget fullscreenDialog(BuildContext context, String text) =>
+      Dialog.fullscreen(
+          child: Container(
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                    Color.fromARGB(255, 243, 184, 145),
+                    Color.fromRGBO(235, 161, 122, 115),
+                  ])),
+              child: Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                    Text(
+                      text,
+                      style: const TextStyle(fontSize: 48),
+                    ),
+                    const SizedBox(height: 30),
+                    text == 'Paused'
+                        ? TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              startTimer();
+                            },
+                            style: TextButton.styleFrom(
+                                padding: const EdgeInsets.all(20)),
+                            child: const Text('Continue',
+                                style: TextStyle(fontSize: 36)))
+                        : replayButton(context),
+                    const SizedBox(height: 20),
+                    homeButton(context),
+                  ]))));
 }
 
 Widget replayButton(BuildContext context) => TextButton(
-      child: const Text('Play Again'),
+      child: const Text('Play Again', style: TextStyle(fontSize: 36)),
       onPressed: () {
         Navigator.pushReplacementNamed(context, MyGame.routeName);
       },
     );
 
 Widget homeButton(BuildContext context) => TextButton(
-      child: const Text('Home'),
+      child: const Text('Home', style: TextStyle(fontSize: 36)),
       onPressed: () {
         Navigator.pushReplacementNamed(context, MainMenu.routeName);
       },
