@@ -81,6 +81,7 @@ class _MyGameState extends State<MyGame> {
         });
 
         showDialog(
+            barrierDismissible: false,
             context: context,
             builder: (context) {
               return fullscreenDialog(context, "Sorry you did not make it");
@@ -110,7 +111,10 @@ class _MyGameState extends State<MyGame> {
             leading: Row(children: [
               const SizedBox(width: 20),
               const Icon(Icons.timer_sharp),
-              Text('${secondsLeft}s')
+              Text(
+                '${secondsLeft}s',
+                style: const TextStyle(fontFamily: 'Silkscreen'),
+              )
             ]),
             automaticallyImplyLeading: false,
             actions: [
@@ -118,6 +122,7 @@ class _MyGameState extends State<MyGame> {
                   onPressed: () {
                     _timer.cancel();
                     showDialog(
+                        barrierDismissible: false,
                         context: context,
                         builder: (context) {
                           return fullscreenDialog(context, 'Paused');
@@ -125,52 +130,59 @@ class _MyGameState extends State<MyGame> {
                   },
                   icon: const Icon(Icons.pause))
             ],
-            title: Text('Category: $chosenCategory')),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '[$chosenCategory]',
+                  style: const TextStyle(fontFamily: 'SilkScreen'),
+                ),
+                const SizedBox(width: 30),
+                Text('Found: ${found.length} / $expectedItemCount',
+                    style: const TextStyle(
+                        color: Colors.green,
+                        fontSize: 18,
+                        fontFamily: 'Silkscreen')),
+                const SizedBox(width: 15),
+                Text(
+                  'Wrong: ${wrong.length}',
+                  style: TextStyle(
+                      color: Colors.red[300],
+                      fontSize: 18,
+                      fontFamily: 'Silkscreen'),
+                )
+              ],
+            )),
         body: SafeArea(
+            maintainBottomViewPadding: true,
             child: Column(
-          children: [
-            Container(
-                width: MediaQuery.sizeOf(context).width,
-                decoration: BoxDecoration(color: Colors.blue[100]!),
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Found: ${found.length} / $expectedItemCount',
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 16)),
-                        const SizedBox(width: 15),
-                        Text(
-                          'Wrong: ${wrong.length}',
-                          style:
-                              TextStyle(color: Colors.red[300], fontSize: 16),
-                        )
-                      ],
-                    ))),
-            Expanded(
-              child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                        Colors.blue[100]!,
-                        Colors.lightBlueAccent,
-                        Colors.blueGrey[50]!,
-                        Colors.blueGrey[200]!,
-                        Colors.lightBlueAccent,
-                        Colors.blueAccent,
-                        Colors.blue[900]!,
-                        Colors.blueGrey[800]!,
-                      ])),
-                  child: GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: colCount,
-                        children: spriteList)))
-          ],
-        )));
+              children: [
+                Expanded(
+                    child: Container(
+                        width: MediaQuery.sizeOf(context).width,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                              Colors.blue[100]!,
+                              Colors.lightBlueAccent,
+                              Colors.blueGrey[50]!,
+                              Colors.blueGrey[200]!,
+                              Colors.lightBlueAccent,
+                              Colors.blueAccent,
+                              Colors.blue[900]!,
+                              Colors.blueGrey[800]!,
+                            ])),
+                        child: GridView.count(
+                            shrinkWrap: true,
+                            crossAxisCount: colCount,
+                            children: spriteList))),
+                Container(width: MediaQuery.sizeOf(context).width, height: 1)
+              ],
+            )));
   }
 
   generateSpriteList() {
@@ -205,6 +217,7 @@ class _MyGameState extends State<MyGame> {
                 if (expected.isEmpty) {
                   _timer.cancel();
                   showDialog(
+                      barrierDismissible: false,
                       context: context,
                       builder: (context) {
                         return fullscreenDialog(context, 'You made it!');
@@ -233,7 +246,8 @@ class _MyGameState extends State<MyGame> {
               ),
               child: Image.asset(
                   'assets/images/random/${keyId - randomStart}.png',
-                  width: 40, height: 50)),
+                  width: 40,
+                  height: 50)),
           onTap: (id) {
             setState(() {
               secondsLeft -= 2;
@@ -262,7 +276,8 @@ class _MyGameState extends State<MyGame> {
                       children: [
                     Text(
                       text,
-                      style: const TextStyle(fontSize: 48),
+                      style: const TextStyle(
+                          fontSize: 48, fontFamily: 'Silkscreen'),
                     ),
                     const SizedBox(height: 30),
                     text == 'Paused'
@@ -274,7 +289,8 @@ class _MyGameState extends State<MyGame> {
                             style: TextButton.styleFrom(
                                 padding: const EdgeInsets.all(20)),
                             child: const Text('Continue',
-                                style: TextStyle(fontSize: 36)))
+                                style: TextStyle(
+                                    fontSize: 36, fontFamily: 'Silkscreen')))
                         : replayButton(context),
                     const SizedBox(height: 20),
                     homeButton(context),
@@ -282,14 +298,16 @@ class _MyGameState extends State<MyGame> {
 }
 
 Widget replayButton(BuildContext context) => TextButton(
-      child: const Text('Play Again', style: TextStyle(fontSize: 36)),
+      child: const Text('Play Again',
+          style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
       onPressed: () {
         Navigator.pushReplacementNamed(context, MyGame.routeName);
       },
     );
 
 Widget homeButton(BuildContext context) => TextButton(
-      child: const Text('Home', style: TextStyle(fontSize: 36)),
+      child: const Text('Home',
+          style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
       onPressed: () {
         Navigator.pushReplacementNamed(context, MainMenu.routeName);
       },

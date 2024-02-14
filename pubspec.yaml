@@ -11,7 +11,6 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -26,6 +25,7 @@ flutter:
   generate: true
 
   assets:
+    - assets/fonts/Silkscreen/
     - assets/images/background/
     - assets/images/bottle/
     - assets/images/can/
@@ -37,3 +37,9 @@ flutter:
     - assets/images/parcel/
     - assets/images/plastic/
     - assets/images/random/
+
+  fonts:
+    - family: Silkscreen
+      fonts:
+        - asset: assets/fonts/Silkscreen/Silkscreen-Regular.ttf
+

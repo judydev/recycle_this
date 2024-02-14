@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:recycle_this/src/routes.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +16,6 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (RouteSettings routeSettings) =>
           generateRoutes(routeSettings),
       initialRoute: '/',
-      theme: ThemeData(textTheme: GoogleFonts.silkscreenTextTheme()),
     );
   }
 }

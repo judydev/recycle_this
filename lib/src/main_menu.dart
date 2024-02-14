@@ -23,23 +23,27 @@ class _MainMenuState extends State<MainMenu> {
         ),
         body: Center(
             child: Column(
+                mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
           children: [            
-                const Text('Ready to play?', style: TextStyle(fontSize: 48)),
-          const SizedBox(height: 30),
+              const Text('Ready to play?',
+                  style: TextStyle(fontSize: 48, fontFamily: 'Silkscreen')),
+              // const SizedBox(height: 30),
                 TextButton(
-              style: TextButton.styleFrom(padding: const EdgeInsets.all(20)),
+                  // style: TextButton.styleFrom(padding: const EdgeInsets.all(20)),
                   onPressed: () {
                     Navigator.pushNamed(context, MyGame.routeName);
                   },
-              child: const Text('Start', style: TextStyle(fontSize: 36))),
+                  child: const Text('Start',
+                      style:
+                          TextStyle(fontSize: 36, fontFamily: 'Silkscreen'))),
                 TextButton(
-                  style:
-                      TextButton.styleFrom(padding: const EdgeInsets.all(20)),
+                // style: TextButton.styleFrom(padding: const EdgeInsets.all(20)),
                   onPressed: () {
               Navigator.pushNamed(context, SettingsView.routeName);
                   },
-                  child: const Text('Settings', style: TextStyle(fontSize: 36)),
+                child: const Text('Settings',
+                    style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
           )
         ])));
   }
