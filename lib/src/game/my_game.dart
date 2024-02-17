@@ -84,7 +84,7 @@ class _MyGameState extends State<MyGame> {
             barrierDismissible: false,
             context: context,
             builder: (context) {
-              return fullscreenDialog(context, "Sorry you did not make it");
+              return fullscreenDialog(context, "Time's up");
             });
       } else {
         setState(() {
@@ -105,8 +105,10 @@ class _MyGameState extends State<MyGame> {
     }
 
     return Scaffold(
+        backgroundColor: Colors.blue[100],
         appBar: AppBar(
-            backgroundColor: Colors.blue[100]!,
+            surfaceTintColor: Colors.blue[100],
+            backgroundColor: Colors.blue[100],
             leadingWidth: 80,
             leading: Row(children: [
               const SizedBox(width: 20),
@@ -155,33 +157,14 @@ class _MyGameState extends State<MyGame> {
               ],
             )),
         body: SafeArea(
-            maintainBottomViewPadding: true,
-            child: Column(
-              children: [
-                Expanded(
-                    child: Container(
-                        width: MediaQuery.sizeOf(context).width,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                              Colors.blue[100]!,
-                              Colors.lightBlueAccent,
-                              Colors.blueGrey[50]!,
-                              Colors.blueGrey[200]!,
-                              Colors.lightBlueAccent,
-                              Colors.blueAccent,
-                              Colors.blue[900]!,
-                              Colors.blueGrey[800]!,
-                            ])),
-                        child: GridView.count(
-                            shrinkWrap: true,
-                            crossAxisCount: colCount,
-                            children: spriteList))),
-                Container(width: MediaQuery.sizeOf(context).width, height: 1)
-              ],
+            left: false,
+            bottom: false,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              child: GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: colCount,
+                  children: spriteList),
             )));
   }
 
@@ -255,21 +238,15 @@ class _MyGameState extends State<MyGame> {
             });
           });
     }));
-      
+
     return list;
   }
 
   Widget fullscreenDialog(BuildContext context, String text) =>
-      Dialog.fullscreen(
-          child: Container(
-              decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                    Color.fromARGB(255, 243, 184, 145),
-                    Color.fromRGBO(235, 161, 122, 115),
-                  ])),
+      AlertDialog(
+      backgroundColor: const Color.fromARGB(255, 243, 184, 145),
+      content: SizedBox(
+          width: MediaQuery.sizeOf(context).width - 100,
               child: Center(
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
