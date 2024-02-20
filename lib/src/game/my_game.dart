@@ -40,14 +40,14 @@ Map<Categories, int> countMap = {
 
 const randomCount = 13;
 
+ValueNotifier<Set<int>> foundSetNotifier = ValueNotifier<Set<int>>({});
+ValueNotifier<Set<int>> wrongSetNotifier = ValueNotifier<Set<int>>({});
+
 class _MyGameState extends State<MyGame> {
   late final String? chosenCategory;
   late final int? expectedItemCount;
   late List<Widget> spriteList = [];
-
-  Set<int> found = {};
-  Set<int> wrong = {};
-  Set<int> expected = {};
+  Set<int> expectedSet = {};
 
   Timer _timer = Timer(Duration.zero, () {});
   int secondsLeft = 30;
@@ -76,20 +76,14 @@ class _MyGameState extends State<MyGame> {
   void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsLeft <= 0) {
-        setState(() {
-          timer.cancel();
-        });
+        setState(() => timer.cancel());
 
         showDialog(
             barrierDismissible: false,
             context: context,
-            builder: (context) {
-              return fullscreenDialog(context, "Time's up");
-            });
+            builder: (context) => fullscreenDialog(context, "Time's up"));
       } else {
-        setState(() {
-          secondsLeft--;
-        });
+        setState(() => secondsLeft--);
       }
     });
   }
@@ -126,9 +120,8 @@ class _MyGameState extends State<MyGame> {
                     showDialog(
                         barrierDismissible: false,
                         context: context,
-                        builder: (context) {
-                          return fullscreenDialog(context, 'Paused');
-                        });
+                        builder: (context) =>
+                            fullscreenDialog(context, 'Paused'));
                   },
                   icon: const Icon(Icons.pause))
             ],
@@ -141,14 +134,15 @@ class _MyGameState extends State<MyGame> {
                   style: const TextStyle(fontFamily: 'SilkScreen'),
                 ),
                 const SizedBox(width: 30),
-                Text('Found: ${found.length} / $expectedItemCount',
+                Text(
+                    'Found: ${foundSetNotifier.value.length} / $expectedItemCount',
                     style: const TextStyle(
                         color: Colors.green,
                         fontSize: 18,
                         fontFamily: 'Silkscreen')),
                 const SizedBox(width: 15),
                 Text(
-                  'Wrong: ${wrong.length}',
+                  'Wrong: ${wrongSetNotifier.value.length}',
                   style: TextStyle(
                       color: Colors.red[300],
                       fontSize: 18,
@@ -176,41 +170,31 @@ class _MyGameState extends State<MyGame> {
       list.addAll(List.generate(countMap[categoryKey]!, (i) {
         keyId++;
         if (category == chosenCategory) {
-          expected.add(keyId);
+          expectedSet.add(keyId);
         }
 
         return Tappable(
             id: keyId,
-            child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationZ(
-                  Random().nextDouble() * 2 * pi,
-                ),
-                child: Image.asset(
+            child: Image.asset(
                     'assets/images/$category/$category-${i + 1}.png',
                     width: 40,
-                    height: 50)),
+                    height: 50),
             onTap: (id) {
               if (category == chosenCategory) {
-                setState(() {
-                  found.add(id);
-                  expected.remove(id);
-                });
+                setState(() => expectedSet.remove(id));
+                foundSetNotifier.value.add(id);
 
-                if (expected.isEmpty) {
+                if (expectedSet.isEmpty) {
                   _timer.cancel();
                   showDialog(
                       barrierDismissible: false,
                       context: context,
-                      builder: (context) {
-                        return fullscreenDialog(context, 'You made it!');
-                      });
+                      builder: (context) =>
+                          fullscreenDialog(context, 'You made it!'));
                 }
               } else {
-                setState(() {
-                  secondsLeft -= 2;
-                  wrong.add(id);
-                });
+                setState(() => secondsLeft -= 2);
+                wrongSetNotifier.value.add(id);
               }
             });
       }));
@@ -222,20 +206,13 @@ class _MyGameState extends State<MyGame> {
 
       return Tappable(
           id: keyId,
-          child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationZ(
-                Random().nextDouble() * 2 * pi,
-              ),
-              child: Image.asset(
+          child: Image.asset(
                   'assets/images/random/${keyId - randomStart}.png',
                   width: 40,
-                  height: 50)),
+                  height: 50),
           onTap: (id) {
-            setState(() {
-              secondsLeft -= 2;
-              wrong.add(id);
-            });
+            setState(() => secondsLeft -= 2);
+            wrongSetNotifier.value.add(id);
           });
     }));
 
@@ -278,6 +255,10 @@ Widget replayButton(BuildContext context) => TextButton(
       child: const Text('Play Again',
           style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
       onPressed: () {
+        // reset
+        foundSetNotifier.value = {};
+        wrongSetNotifier.value = {};
+
         Navigator.pushReplacementNamed(context, MyGame.routeName);
       },
     );
