@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:recycle_this/main.dart';
 import 'package:recycle_this/src/main_menu.dart';
 import 'package:recycle_this/src/game/tappable.dart';
+import 'package:flame_audio/flame_audio.dart';
+import 'package:recycle_this/src/settings/settings_controller.dart';
 
 int colCount = 10;
 
 class MyGame extends StatefulWidget {
-  const MyGame({super.key});
+  const MyGame({super.key, required this.settingsController});
   static const routeName = '/startgame';
+  final SettingsController settingsController;
 
   @override
   State<MyGame> createState() => _MyGameState();
@@ -17,25 +21,25 @@ class MyGame extends StatefulWidget {
 enum Categories {
   bottle,
   can,
+  cardboard,
   clothes,
   cup,
   electronics,
   furniture,
   paper,
-  parcel,
-  plastic,
+  plasticbag,
 }
 
-Map<Categories, int> countMap = {
+Map<Categories, int> categoryCountMap = {
   Categories.bottle: 14,
   Categories.can: 14,
+  Categories.cardboard: 10,
   Categories.clothes: 12,
   Categories.cup: 7,
   Categories.electronics: 12,
   Categories.furniture: 13,
   Categories.paper: 12,
-  Categories.parcel: 1,
-  Categories.plastic: 6,
+  Categories.plasticbag: 6,
 };
 
 const randomCount = 13;
@@ -44,7 +48,8 @@ ValueNotifier<Set<int>> foundSetNotifier = ValueNotifier<Set<int>>({});
 ValueNotifier<Set<int>> wrongSetNotifier = ValueNotifier<Set<int>>({});
 
 class _MyGameState extends State<MyGame> {
-  late final String? chosenCategory;
+  late final settingsController = widget.settingsController;
+  late final String? targetCategory;
   late final int? expectedItemCount;
   late List<Widget> spriteList = [];
   Set<int> expectedSet = {};
@@ -56,20 +61,29 @@ class _MyGameState extends State<MyGame> {
   void initState() {
     super.initState();
 
-    final keys = countMap.keys.toList();
-    final chosenKey = keys[Random().nextInt(keys.length)];
-    expectedItemCount = countMap[chosenKey];
-    chosenCategory = chosenKey.name;
+    // pick a random category as target
+    final keys = categoryCountMap.keys.toList();
+    final randomKey = keys[Random().nextInt(keys.length)];
+    expectedItemCount = categoryCountMap[randomKey];
+    targetCategory = randomKey.name;
 
+    // get object images and shuffle for display
     spriteList = generateSpriteList();
     spriteList.shuffle();
 
+    // start timer and play a random bgm
     startTimer();
+    String bgmFileName = bgms[Random().nextInt(bgms.length)];
+    if (settingsController.backgroundMusicOn) {
+      FlameAudio.bgm.audioPlayer.setSource(AssetSource(bgmFileName));
+    }
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    FlameAudio.bgm.dispose();
+    reset();
     super.dispose();
   }
 
@@ -77,7 +91,11 @@ class _MyGameState extends State<MyGame> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (secondsLeft <= 0) {
         setState(() => timer.cancel());
+        FlameAudio.bgm.stop();
 
+        if (settingsController.backgroundMusicOn) {
+          FlameAudio.play('game_over.m4a');
+        }
         showDialog(
             barrierDismissible: false,
             context: context,
@@ -86,11 +104,15 @@ class _MyGameState extends State<MyGame> {
         setState(() => secondsLeft--);
       }
     });
+
+    if (settingsController.backgroundMusicOn) {
+      FlameAudio.bgm.resume();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (chosenCategory == null) {
+    if (targetCategory == null) {
       Navigator.popAndPushNamed(context, MainMenu.routeName);
       return Scaffold(
         appBar: AppBar(),
@@ -117,6 +139,8 @@ class _MyGameState extends State<MyGame> {
               IconButton(
                   onPressed: () {
                     _timer.cancel();
+                    FlameAudio.bgm.pause();
+
                     showDialog(
                         barrierDismissible: false,
                         context: context,
@@ -130,7 +154,7 @@ class _MyGameState extends State<MyGame> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '[$chosenCategory]',
+                  '[${getTargetCategoryName(targetCategory)}]',
                   style: const TextStyle(fontFamily: 'SilkScreen'),
                 ),
                 const SizedBox(width: 30),
@@ -165,11 +189,11 @@ class _MyGameState extends State<MyGame> {
   generateSpriteList() {
     List<Widget> list = [];
     int keyId = 0;
-    for (final categoryKey in countMap.keys) {
+    for (final categoryKey in categoryCountMap.keys) {
       String category = categoryKey.name;
-      list.addAll(List.generate(countMap[categoryKey]!, (i) {
+      list.addAll(List.generate(categoryCountMap[categoryKey]!, (i) {
         keyId++;
-        if (category == chosenCategory) {
+        if (category == targetCategory) {
           expectedSet.add(keyId);
         }
 
@@ -180,12 +204,21 @@ class _MyGameState extends State<MyGame> {
                     width: 40,
                     height: 50),
             onTap: (id) {
-              if (category == chosenCategory) {
+              if (category == targetCategory) {
+                if (settingsController.soundEffectOn) {
+                  FlameAudio.play('correct.m4a');
+                }
+
                 setState(() => expectedSet.remove(id));
                 foundSetNotifier.value.add(id);
 
                 if (expectedSet.isEmpty) {
                   _timer.cancel();
+                  FlameAudio.bgm.stop();
+
+                  if (settingsController.backgroundMusicOn) {
+                    FlameAudio.play('game_pass.m4a');
+                  }
                   showDialog(
                       barrierDismissible: false,
                       context: context,
@@ -193,8 +226,7 @@ class _MyGameState extends State<MyGame> {
                           fullscreenDialog(context, 'You made it!'));
                 }
               } else {
-                setState(() => secondsLeft -= 2);
-                wrongSetNotifier.value.add(id);
+                selectWrong(id);
               }
             });
       }));
@@ -211,17 +243,31 @@ class _MyGameState extends State<MyGame> {
                   width: 40,
                   height: 50),
           onTap: (id) {
-            setState(() => secondsLeft -= 2);
-            wrongSetNotifier.value.add(id);
+            selectWrong(id);
           });
     }));
 
     return list;
   }
 
+  selectWrong(id) {
+    if (settingsController.soundEffectOn) {
+      FlameAudio.play('wrong.m4a');
+    }
+    setState(() => secondsLeft -= 2);
+    wrongSetNotifier.value.add(id);
+  }
+
+  getTargetCategoryName(category) {
+    if (category == 'plasticbag') {
+      return 'Plastic Bag';
+    }
+    return category;
+  }
+
   Widget fullscreenDialog(BuildContext context, String text) =>
       AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 243, 184, 145),
+      backgroundColor: backgroundColor,
       content: SizedBox(
           width: MediaQuery.sizeOf(context).width - 100,
               child: Center(
@@ -239,6 +285,9 @@ class _MyGameState extends State<MyGame> {
                             onPressed: () {
                               Navigator.of(context).pop();
                               startTimer();
+                          if (settingsController.backgroundMusicOn) {
+                            FlameAudio.bgm.resume();
+                          }
                             },
                             style: TextButton.styleFrom(
                                 padding: const EdgeInsets.all(20)),
@@ -251,14 +300,16 @@ class _MyGameState extends State<MyGame> {
                   ]))));
 }
 
+reset() {
+  foundSetNotifier.value = {};
+  wrongSetNotifier.value = {};
+}
+
 Widget replayButton(BuildContext context) => TextButton(
       child: const Text('Play Again',
           style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
       onPressed: () {
-        // reset
-        foundSetNotifier.value = {};
-        wrongSetNotifier.value = {};
-
+        reset();
         Navigator.pushReplacementNamed(context, MyGame.routeName);
       },
     );
@@ -267,6 +318,7 @@ Widget homeButton(BuildContext context) => TextButton(
       child: const Text('Home',
           style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
       onPressed: () {
+        FlameAudio.bgm.stop();
         Navigator.pushReplacementNamed(context, MainMenu.routeName);
       },
     );

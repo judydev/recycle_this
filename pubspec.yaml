@@ -7,10 +7,12 @@ environment:
   sdk: '>=3.2.2 <4.0.0'
 
 dependencies:
+  flame_audio: ^2.10.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -25,17 +27,28 @@ flutter:
   generate: true
 
   assets:
+    - assets/audio/Acoustic_BPM105.wav
+    - assets/audio/Comedy_BPM130.wav
+    - assets/audio/Lofi_Hip_Hop_BPM85.wav
+    - assets/audio/Pop_BPM105.wav
+    - assets/audio/Pop_BPM136.wav
+    - assets/audio/Rnb_BPM130.wav
+    - assets/audio/Rock_BPM100.wav
+    - assets/audio/correct.m4a
+    - assets/audio/game_over.m4a
+    - assets/audio/game_pass.m4a
+    - assets/audio/wrong.m4a
     - assets/fonts/Silkscreen/
     - assets/images/background/
     - assets/images/bottle/
     - assets/images/can/
+    - assets/images/cardboard/
     - assets/images/clothes/
     - assets/images/cup/
     - assets/images/electronics/
     - assets/images/furniture/
     - assets/images/paper/
-    - assets/images/parcel/
-    - assets/images/plastic/
+    - assets/images/plasticbag/
     - assets/images/random/
 
   fonts:
