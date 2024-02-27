@@ -326,12 +326,14 @@ showCategoryPopup(context) {
                         arguments: randomKey);
                   },
                   style: ButtonStyle(
+                    padding:const MaterialStatePropertyAll(EdgeInsets.all(20)),
                       backgroundColor:
                           MaterialStatePropertyAll(Colors.brown[200]),
-                      shape: const MaterialStatePropertyAll(
-                          CircleBorder(side: BorderSide(width: 1)))),
+                      shape:  MaterialStatePropertyAll(
+                          CircleBorder(side: BorderSide(width: 2, color: Colors.brown[300]!)))
+                          ),
                   child: const Text('Go',
-                      style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')))
+                      style: TextStyle(fontSize: 32, fontFamily: 'Silkscreen')))
             ],
           ),
         ));

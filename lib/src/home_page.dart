@@ -23,9 +23,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: backgroundColor,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          toolbarHeight: 210,
+          toolbarHeight: MediaQuery.sizeOf(context).height * 0.8,
           backgroundColor: backgroundColor,
-          title: Image.asset('assets/images/background/banner.png'),
+          title: Center(child: Image.asset('assets/images/background/banner.png')),
         ),
         body: Center(
             child: Row(
