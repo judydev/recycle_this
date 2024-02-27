@@ -22,6 +22,7 @@ class _MyGameState extends State<MyGame> {
   late final settingsController = widget.settingsController;
   late final Categories? randomKey = widget.randomKey;
   late final String? targetCategory;
+  late final String categoryDisplayName;
   late final int? expectedItemCount;
   late List<Widget> spriteList = [];
   Set<int> expectedSet = {};
@@ -39,6 +40,7 @@ class _MyGameState extends State<MyGame> {
 
     expectedItemCount = categoryCountMap[randomKey];
     targetCategory = randomKey!.name;
+    categoryDisplayName = getTargetCategoryName(targetCategory);
 
     // get object images and shuffle for display
     spriteList = generateSpriteList();
@@ -130,8 +132,8 @@ class _MyGameState extends State<MyGame> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  '[${getTargetCategoryName(targetCategory)}]',
-                  style: const TextStyle(fontFamily: 'SilkScreen'),
+                  '[$categoryDisplayName]',
+                  style: const TextStyle(fontFamily: 'Silkscreen'),
                 ),
                 const SizedBox(width: 30),
                 Text(
@@ -358,7 +360,7 @@ enum Categories {
   plasticbag,
 }
 
-getTargetCategoryName(category) {
+String getTargetCategoryName(category) {
   if (category == 'plasticbag') {
     return 'Plastic Bag';
   }

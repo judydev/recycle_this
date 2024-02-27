@@ -25,7 +25,8 @@ class _HomePageState extends State<HomePage> {
           automaticallyImplyLeading: false,
           toolbarHeight: MediaQuery.sizeOf(context).height * 0.8,
           backgroundColor: backgroundColor,
-          title: Center(child: Image.asset('assets/images/background/banner.png')),
+          title:
+              Center(child: Image.asset('assets/images/background/banner.png')),
         ),
         body: Center(
             child: Row(
@@ -44,17 +45,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget button(String text, onPressed) {
     return TextButton(
-        style: ButtonStyle(
-          padding: const MaterialStatePropertyAll(EdgeInsets.all(10)),
-          overlayColor: MaterialStateProperty.all(Colors.amber),
-          foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-              if (states.contains(MaterialState.hovered)) {
-                return Colors.black;
-              }
-              return null; // defer to the defaults
-            },
-          ),
+        style: const ButtonStyle(
+          padding: MaterialStatePropertyAll(EdgeInsets.all(10)),
         ),
         onPressed: () {
           if (settingsController.soundEffectOn) {
