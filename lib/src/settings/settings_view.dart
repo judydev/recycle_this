@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recycle_this/src/main_menu.dart';
+import 'package:recycle_this/src/home_page.dart';
 import 'package:recycle_this/src/settings/settings_controller.dart';
 
 class SettingsView extends StatefulWidget {

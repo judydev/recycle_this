@@ -1,54 +1,26 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:recycle_this/main.dart';
-import 'package:recycle_this/src/main_menu.dart';
+import 'package:recycle_this/src/home_page.dart';
 import 'package:recycle_this/src/game/tappable.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:recycle_this/src/settings/settings_controller.dart';
 
-int colCount = 10;
-
 class MyGame extends StatefulWidget {
-  const MyGame({super.key, required this.settingsController});
+  const MyGame({super.key, required this.settingsController, this.randomKey});
   static const routeName = '/startgame';
   final SettingsController settingsController;
+  final Categories? randomKey;
 
   @override
   State<MyGame> createState() => _MyGameState();
 }
 
-enum Categories {
-  bottle,
-  can,
-  cardboard,
-  clothes,
-  cup,
-  electronics,
-  furniture,
-  paper,
-  plasticbag,
-}
-
-Map<Categories, int> categoryCountMap = {
-  Categories.bottle: 14,
-  Categories.can: 14,
-  Categories.cardboard: 10,
-  Categories.clothes: 12,
-  Categories.cup: 7,
-  Categories.electronics: 12,
-  Categories.furniture: 13,
-  Categories.paper: 12,
-  Categories.plasticbag: 6,
-};
-
-const randomCount = 13;
-
-ValueNotifier<Set<int>> foundSetNotifier = ValueNotifier<Set<int>>({});
-ValueNotifier<Set<int>> wrongSetNotifier = ValueNotifier<Set<int>>({});
-
 class _MyGameState extends State<MyGame> {
   late final settingsController = widget.settingsController;
+  late final Categories? randomKey = widget.randomKey;
   late final String? targetCategory;
   late final int? expectedItemCount;
   late List<Widget> spriteList = [];
@@ -61,11 +33,10 @@ class _MyGameState extends State<MyGame> {
   void initState() {
     super.initState();
 
-    // pick a random category as target
-    final keys = categoryCountMap.keys.toList();
-    final randomKey = keys[Random().nextInt(keys.length)];
     expectedItemCount = categoryCountMap[randomKey];
-    targetCategory = randomKey.name;
+    if (randomKey != null) {
+      targetCategory = randomKey!.name;
+    }
 
     // get object images and shuffle for display
     spriteList = generateSpriteList();
@@ -99,7 +70,7 @@ class _MyGameState extends State<MyGame> {
         showDialog(
             barrierDismissible: false,
             context: context,
-            builder: (context) => fullscreenDialog(context, "Time's up"));
+            builder: (context) => popupDialog(context, "Time's up"));
       } else {
         setState(() => secondsLeft--);
       }
@@ -112,8 +83,7 @@ class _MyGameState extends State<MyGame> {
 
   @override
   Widget build(BuildContext context) {
-    if (targetCategory == null) {
-      Navigator.popAndPushNamed(context, MainMenu.routeName);
+    if (randomKey == null) {
       return Scaffold(
         appBar: AppBar(),
         body: const Text('Error, please go back to the menu'),
@@ -139,13 +109,16 @@ class _MyGameState extends State<MyGame> {
               IconButton(
                   onPressed: () {
                     _timer.cancel();
+                    if (settingsController.soundEffectOn) {
+                      SystemSound.play(SystemSoundType.click);
+                    }
+
                     FlameAudio.bgm.pause();
 
                     showDialog(
                         barrierDismissible: false,
                         context: context,
-                        builder: (context) =>
-                            fullscreenDialog(context, 'Paused'));
+                        builder: (context) => popupDialog(context, 'Paused'));
                   },
                   icon: const Icon(Icons.pause))
             ],
@@ -199,10 +172,8 @@ class _MyGameState extends State<MyGame> {
 
         return Tappable(
             id: keyId,
-            child: Image.asset(
-                    'assets/images/$category/$category-${i + 1}.png',
-                    width: 40,
-                    height: 50),
+            child: Image.asset('assets/images/$category/$category-${i + 1}.png',
+                width: 40, height: 50),
             onTap: (id) {
               if (category == targetCategory) {
                 if (settingsController.soundEffectOn) {
@@ -223,7 +194,7 @@ class _MyGameState extends State<MyGame> {
                       barrierDismissible: false,
                       context: context,
                       builder: (context) =>
-                          fullscreenDialog(context, 'You made it!'));
+                          popupDialog(context, 'You made it!'));
                 }
               } else {
                 selectWrong(id);
@@ -238,10 +209,8 @@ class _MyGameState extends State<MyGame> {
 
       return Tappable(
           id: keyId,
-          child: Image.asset(
-                  'assets/images/random/${keyId - randomStart}.png',
-                  width: 40,
-                  height: 50),
+          child: Image.asset('assets/images/random/${keyId - randomStart}.png',
+              width: 40, height: 50),
           onTap: (id) {
             selectWrong(id);
           });
@@ -258,67 +227,151 @@ class _MyGameState extends State<MyGame> {
     wrongSetNotifier.value.add(id);
   }
 
-  getTargetCategoryName(category) {
-    if (category == 'plasticbag') {
-      return 'Plastic Bag';
-    }
-    return category;
-  }
-
-  Widget fullscreenDialog(BuildContext context, String text) =>
-      AlertDialog(
+  Widget popupDialog(BuildContext context, String text) => AlertDialog(
       backgroundColor: backgroundColor,
       content: SizedBox(
-          width: MediaQuery.sizeOf(context).width - 100,
-              child: Center(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                    Text(
-                      text,
-                      style: const TextStyle(
-                          fontSize: 48, fontFamily: 'Silkscreen'),
-                    ),
-                    const SizedBox(height: 30),
-                    text == 'Paused'
-                        ? TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              startTimer();
+          width: MediaQuery.sizeOf(context).width,
+          child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                Text(
+                  text,
+                  style:
+                      const TextStyle(fontSize: 48, fontFamily: 'Silkscreen'),
+                ),
+                const SizedBox(height: 30),
+                text == 'Paused'
+                    ? TextButton(
+                        onPressed: () {
+                          if (settingsController.soundEffectOn) {
+                            SystemSound.play(SystemSoundType.click);
+                          }
+
+                          Navigator.of(context).pop();
+                          startTimer();
                           if (settingsController.backgroundMusicOn) {
                             FlameAudio.bgm.resume();
                           }
-                            },
-                            style: TextButton.styleFrom(
-                                padding: const EdgeInsets.all(20)),
-                            child: const Text('Continue',
-                                style: TextStyle(
-                                    fontSize: 36, fontFamily: 'Silkscreen')))
-                        : replayButton(context),
-                    const SizedBox(height: 20),
-                    homeButton(context),
-                  ]))));
+                        },
+                        style: TextButton.styleFrom(
+                            padding: const EdgeInsets.all(20)),
+                        child: const Text('Continue',
+                            style: TextStyle(
+                                fontSize: 36, fontFamily: 'Silkscreen')))
+                    : replayButton(context, settingsController.soundEffectOn),
+                const SizedBox(height: 20),
+                homeButton(context, settingsController.soundEffectOn),
+              ]))));
+  reset() {
+    foundSetNotifier.value = {};
+    wrongSetNotifier.value = {};
+  }
+
+  Widget replayButton(BuildContext context, bool soundEffectOn) => TextButton(
+        child: const Text('Play Again',
+            style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
+        onPressed: () async {
+          if (soundEffectOn) {
+            SystemSound.play(SystemSoundType.click);
+          }
+
+          reset();
+
+          await showCategoryPopup(context);
+        },
+      );
+
+  Widget homeButton(BuildContext context, bool soundEffectOn) => TextButton(
+        child: const Text('Home',
+            style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
+        onPressed: () {
+          if (soundEffectOn) {
+            SystemSound.play(SystemSoundType.click);
+          }
+
+          FlameAudio.bgm.stop();
+          Navigator.pushReplacementNamed(context, HomePage.routeName);
+        },
+      );
 }
 
-reset() {
-  foundSetNotifier.value = {};
-  wrongSetNotifier.value = {};
+showCategoryPopup(context) {
+  final keys = categoryCountMap.keys.toList();
+  final randomKey = keys[Random().nextInt(keys.length)];
+
+  return showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return Dialog.fullscreen(
+            child: Container(
+          alignment: Alignment.center,
+          color: backgroundColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.7,
+                child: const Text(
+                    'Find objects in the following category within 30 seconds',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, fontFamily: 'Silkscreen')),
+              ),
+              Text(getTargetCategoryName(randomKey.name),
+                  style:
+                      const TextStyle(fontSize: 48, fontFamily: 'Silkscreen')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.popAndPushNamed(context, MyGame.routeName,
+                        arguments: randomKey);
+                  },
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStatePropertyAll(Colors.brown[200]),
+                      shape: const MaterialStatePropertyAll(
+                          CircleBorder(side: BorderSide(width: 1)))),
+                  child: const Text('Go',
+                      style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')))
+            ],
+          ),
+        ));
+      });
 }
 
-Widget replayButton(BuildContext context) => TextButton(
-      child: const Text('Play Again',
-          style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
-      onPressed: () {
-        reset();
-        Navigator.pushReplacementNamed(context, MyGame.routeName);
-      },
-    );
+int colCount = 10;
 
-Widget homeButton(BuildContext context) => TextButton(
-      child: const Text('Home',
-          style: TextStyle(fontSize: 36, fontFamily: 'Silkscreen')),
-      onPressed: () {
-        FlameAudio.bgm.stop();
-        Navigator.pushReplacementNamed(context, MainMenu.routeName);
-      },
-    );
+enum Categories {
+  bottle,
+  can,
+  cardboard,
+  clothes,
+  cup,
+  electronics,
+  furniture,
+  paper,
+  plasticbag,
+}
+
+getTargetCategoryName(category) {
+  if (category == 'plasticbag') {
+    return 'Plastic Bag';
+  }
+  return category;
+}
+
+Map<Categories, int> categoryCountMap = {
+  Categories.bottle: 14,
+  Categories.can: 14,
+  Categories.cardboard: 10,
+  Categories.clothes: 12,
+  Categories.cup: 7,
+  Categories.electronics: 12,
+  Categories.furniture: 13,
+  Categories.paper: 12,
+  Categories.plasticbag: 6,
+};
+
+const randomCount = 13;
+
+ValueNotifier<Set<int>> foundSetNotifier = ValueNotifier<Set<int>>({});
+ValueNotifier<Set<int>> wrongSetNotifier = ValueNotifier<Set<int>>({});

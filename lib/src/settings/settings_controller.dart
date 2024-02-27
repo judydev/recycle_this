@@ -19,7 +19,6 @@ class SettingsController with ChangeNotifier {
   }
 
   Future<void> updateBackgroundMusicSetting(bool? value) async {
-    print('updateBackgroundMusic: $value');
     if (value == null) return;
     if (value == _backgroundMusicOn) return;
 
