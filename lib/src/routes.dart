@@ -11,9 +11,12 @@ generateRoutes(
     builder: (BuildContext context) {
       switch (routeSettings.name) {
         case MyGame.routeName:
+          if (routeSettings.arguments == null) {
+            return HomePage(settingsController: settingsController);
+          }
           return MyGame(
               settingsController: settingsController,
-              randomKey: routeSettings.arguments as Categories);
+              randomKey: routeSettings.arguments as Categories?);
         case SettingsView.routeName:
           return SettingsView(settingsController: settingsController);
         case HomePage.routeName:

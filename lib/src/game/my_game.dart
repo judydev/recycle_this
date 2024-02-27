@@ -10,7 +10,7 @@ import 'package:recycle_this/src/settings/settings_controller.dart';
 
 class MyGame extends StatefulWidget {
   const MyGame({super.key, required this.settingsController, this.randomKey});
-  static const routeName = '/startgame';
+  static const routeName = '/start';
   final SettingsController settingsController;
   final Categories? randomKey;
 
@@ -33,10 +33,12 @@ class _MyGameState extends State<MyGame> {
   void initState() {
     super.initState();
 
-    expectedItemCount = categoryCountMap[randomKey];
-    if (randomKey != null) {
-      targetCategory = randomKey!.name;
+    if (randomKey == null) {
+      return;
     }
+
+    expectedItemCount = categoryCountMap[randomKey];
+    targetCategory = randomKey!.name;
 
     // get object images and shuffle for display
     spriteList = generateSpriteList();
@@ -85,6 +87,7 @@ class _MyGameState extends State<MyGame> {
   Widget build(BuildContext context) {
     if (randomKey == null) {
       return Scaffold(
+        backgroundColor: backgroundColor,
         appBar: AppBar(),
         body: const Text('Error, please go back to the menu'),
       );
@@ -326,12 +329,13 @@ showCategoryPopup(context) {
                         arguments: randomKey);
                   },
                   style: ButtonStyle(
-                    padding:const MaterialStatePropertyAll(EdgeInsets.all(20)),
+                      padding:
+                          const MaterialStatePropertyAll(EdgeInsets.all(20)),
                       backgroundColor:
                           MaterialStatePropertyAll(Colors.brown[200]),
-                      shape:  MaterialStatePropertyAll(
-                          CircleBorder(side: BorderSide(width: 2, color: Colors.brown[300]!)))
-                          ),
+                      shape: MaterialStatePropertyAll(CircleBorder(
+                          side: BorderSide(
+                              width: 2, color: Colors.brown[300]!)))),
                   child: const Text('Go',
                       style: TextStyle(fontSize: 32, fontFamily: 'Silkscreen')))
             ],
