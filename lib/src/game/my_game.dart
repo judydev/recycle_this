@@ -153,7 +153,6 @@ class _MyGameState extends State<MyGame> {
               ],
             )),
         body: SafeArea(
-            left: false,
             bottom: false,
             child: Container(
               padding: const EdgeInsets.all(10),
@@ -304,13 +303,16 @@ class _MyGameState extends State<MyGame> {
 showCategoryPopup(context) {
   final keys = categoryCountMap.keys.toList();
   final randomKey = keys[Random().nextInt(keys.length)];
-
+  
   return showDialog(
       context: context,
       builder: (dialogCtx) {
-        return Dialog.fullscreen(
+        return Dialog(
+            clipBehavior: Clip.hardEdge,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Container(
-          alignment: Alignment.center,
+              width: MediaQuery.sizeOf(context).width,
           color: backgroundColor,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
