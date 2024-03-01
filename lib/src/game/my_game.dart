@@ -282,7 +282,7 @@ class _MyGameState extends State<MyGame> {
 
           reset();
 
-          await showCategoryPopup(context);
+          await showCategoryPopup(context, soundEffectOn);
         },
       );
 
@@ -300,7 +300,7 @@ class _MyGameState extends State<MyGame> {
       );
 }
 
-showCategoryPopup(context) {
+showCategoryPopup(context, soundEffectOn) {
   final keys = categoryCountMap.keys.toList();
   final randomKey = keys[Random().nextInt(keys.length)];
   
@@ -329,6 +329,9 @@ showCategoryPopup(context) {
                       const TextStyle(fontSize: 48, fontFamily: 'Silkscreen')),
               TextButton(
                   onPressed: () {
+                        if (soundEffectOn) {
+                          SystemSound.play(SystemSoundType.click);
+                        }
                     Navigator.popAndPushNamed(context, MyGame.routeName,
                         arguments: randomKey);
                   },

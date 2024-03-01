@@ -34,7 +34,8 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
               button('Play', () async {
-                await showCategoryPopup(context);
+                await showCategoryPopup(
+                    context, settingsController.soundEffectOn);
               }),
               const SizedBox(width: 50),
               button('Settings', () {
